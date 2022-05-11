@@ -20,35 +20,47 @@ LONG_BREAK_MIN = 20
 
 # ---------------------------- TIMER RESET ------------------------------- # 
 def reset_timer():
+    # Clear display
     canvas.delete(ALL)
     canvas.create_text(103, 130, fill="white", text="25:00", font=(FONT_NAME, 35, "bold"))
 
 # ---------------------------- TIMER MECHANISM ------------------------------- # 
 def start_timer():
-    countdown(25)
+    minutes = 25
+    seconds = minutes * 60
+    countdown(seconds)
 # ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
 
 
-def countdown(minutes):
-    canvas.update()
-    canvas.delete(initial_display)
-    while minutes > 0:
-        seconds = 60
-        minutes -= 1
-        while seconds > 0:
-            time.sleep(1)
-            seconds -= 1
-            # if less than 10 seconds, display the extra 0 ie; 00:09
-            if seconds < 10:
-                label = canvas.create_text(103, 130, fill="white", text=f"{minutes}:0{seconds}", font=(FONT_NAME, 35, "bold"))
-                window.update()
-                canvas.delete(label)
-            else:
-                label_2 = canvas.create_text(103, 130, fill="white", text=f"{minutes}:{seconds}", font=(FONT_NAME, 35, "bold"))
-                window.update()
-                canvas.delete(label_2)
+def countdown(count):
+
+    # -----REFACTOR----- #
+    minutes = count // 60
+    seconds = count % 60
+    canvas.itemconfig(timer_display, text=f"{minutes}:{seconds}")
+    if count > 0:
+        window.after(1000, countdown, count - 1)
 
 
+
+    # For each minute, count 60 seconds and subtract a minute
+    # while minutes > 0:
+    #     seconds = 60
+    #     minutes -= 1
+    #     while seconds > 0:
+    #         seconds -= 1
+    #         # if less than 10 seconds, display the extra 0 ie; 00:09
+    #         if seconds < 10:
+    #             timer_label_1 = canvas.create_text(103, 130, text=f"{minutes}:0{seconds}", fill="white", font=(FONT_NAME, 35, "bold"))
+    #             # Clear canvas
+    #             canvas.update()
+    #             canvas.delete(timer_label_1)
+    #         else:
+    #             timer_label_2 = canvas.create_text(103, 130, text=f"{minutes}:{seconds}", fill="white", font=(FONT_NAME, 35, "bold"))
+    #             # Clear canvas
+    #             canvas.update()
+    #             canvas.delete(timer_label_2)
+            # We use this to count our second
 
 # ---------------------------- UI SETUP ------------------------------- #
 # Draw our window
@@ -63,7 +75,7 @@ canvas.create_image(103, 112, image=tomato_img)
 canvas.grid(row=1, column=1)
 
 # Display countdown timer
-initial_display = canvas.create_text(103, 130, text=f"{WORK_MIN}:00", fill="white", font=(FONT_NAME, 35, "bold"))
+timer_display = canvas.create_text(103, 130, text="25:00", fill="white", font=(FONT_NAME, 35, "bold"))
 
 # Draw 'Timer' label
 timer_label = Label(text="Timer", font=(FONT_NAME, 36))
