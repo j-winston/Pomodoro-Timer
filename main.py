@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 from tkinter import *
 import time
 
@@ -22,21 +24,23 @@ REPS = 0
 
 # ---------------------------- TIMER RESET ------------------------------- #
 def reset_timer():
+    # Reset timer, remove check marks,
     global REPS
     REPS = 0
     canvas.itemconfig(timer_display, text=f"00:00")
+    check_mark.config(text="")
 
 
-# ---------------------------- TIMER MECHANISM ------------------------------- # 
+# ---------------------------- TIMER MECHANISM ------------------------------- #
+
 def start_timer():
     global REPS
     REPS += 1
-
     if REPS % 8 == 0:
         timer_label.config(text="Break", fg=BEIGE)
         countdown(LONG_BREAK_MIN * 60)
     elif REPS % 2 == 0:
-        timer_label.config(text="Break", fg=GREEN)
+        timer_label.config(text="Break", fg=MAROON)
         countdown(SHORT_BREAK_MIN * 60)
     else:
         timer_label.config(text="Working", fg=MAROON)
@@ -45,19 +49,25 @@ def start_timer():
 
 # ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
 
-
 def countdown(count):
-    # -----REFACTOR----- #
-    minutes = count // 60
-    seconds = count % 60
-    # To display :00 correctly
-    if seconds < 10:
-        seconds = f"0{seconds}"
-    canvas.itemconfig(timer_display, text=f"{minutes}:{seconds}")
-    if count > 0:
-        window.after(1000, countdown, count - 1)
-    else:
-        start_timer()
+    global REPS
+    # If REPS == 0, timer has stopped, do not run
+    if REPS > 0:
+        minutes = count // 60
+        seconds = count % 60
+        # To display :00 correctly
+        if seconds < 10:
+            seconds = f"0{seconds}"
+        canvas.itemconfig(timer_display, text=f"{minutes}:{seconds}")
+        # Once count hits zero, start the next work or break period
+        if count > 0:
+            window.after(1000, countdown, count - 1)
+        # Once count is zero, add a check mark for a completed work session (REPS = odd number)
+        elif REPS % 2 != 0:
+            timer_label.config(text="Break", fg=MAROON)
+            check_mark.config(text="✔")
+            check_mark.grid(row=3, column=REPS)
+            start_timer()
 
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -89,8 +99,8 @@ start_button.grid(row=2, column=0)
 reset_button = Button(text="Reset", borderwidth=0, command=reset_timer)
 reset_button.grid(row=2, column=2)
 
-# Draw checkmarks
-check_mark = Label(text="✔", fg=MAROON, bg=BLUE, font=("courier", 33, "bold"))
+# Create checkmark label, don't display anything
+check_mark = Label(fg=MAROON, bg=BLUE, font=("courier", 33, "bold"))
 check_mark.grid(row=3, column=1)
 
 window.mainloop()
